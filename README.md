@@ -2,6 +2,5 @@
 LLM based bot for querying data in pdfs
 
 Steps Taken:
- * Tried python venv and then used conda environment(reason for 2 requirements.txt files)
- * Able to see streamlit in browser.
- * Added empty openai key, will try to expand the scope by using LLaMa model and then using from local.
+ * Added the UI set-up
+ * Sending the query from user and getting a standard response from the system.
