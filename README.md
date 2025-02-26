@@ -17,3 +17,6 @@ Modules used:
  * langchain-community
  * langchain-huggingface
  * python-dotenv
+
+Remarks:
+It is working not very satisfactorily
