@@ -2,7 +2,18 @@
 LLM based bot for querying data in pdfs
 
 Steps Taken:
- * Added the chat functionality.
- * Added langchain streaming.
+ * Trying with HuggingFace and Chroma DB
+ * 
 
- Built it based on : https://youtu.be/zKGeRWjJlTU?si=4ZWdoz9t9FPYpC8n
+Built it based on : https://www.youtube.com/watch?v=de6_BjEVWZo&ab_channel=KaushikeeBhawsar
+
+Modules used:
+ * ChromaDB
+ * pysqlite3
+ * protobuf
+ * streamlit
+ * pypdf
+ * langchain
+ * langchain-community
+ * langchain-huggingface
+ * python-dotenv

@@ -1,58 +1,45 @@
 from dotenv import load_dotenv ## loads API keys
-from langchain_core.messages import HumanMessage, AIMessage ## schema for messages
-from langchain_core.prompts import ChatPromptTemplate ## Chat Prompt Template
-from langchain_openai import ChatOpenAI ## for chatting with OpenAI LLM
-from langchain_core.output_parsers.string import StrOutputParser
-
-import streamlit as st ## provides pre-built chatbot UI
+from langchain.document_loaders import PyPDFLoader
+from langchain.embeddings import HuggingFaceEmbeddings
+from langchain.vectorstores import Chroma
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+import os
+from collections import OrderedDict
 
 load_dotenv()
 
-if "chat_history" not in st.session_state:
-    st.session_state.chat_history = []
-st.set_page_config(page_title="AI Chat Bot", page_icon=":sparkler:")
+os.environ["HUGGINGFACEHUB_API_KEY"] = os.getenv("HUGGINGFACEHUB_API_KEY")
 
-st.title("SimSamTra Bot")
-## response from the LLM
-def get_response(query, chat_history):
-    template = """
-    You are a very helpful assistant. Answer the following questions considering the history of this conversation:
+loader = PyPDFLoader("grades_trim.pdf")
+docs = loader.load()
 
-    Chat history: {chat_history}
+text_splitter = RecursiveCharacterTextSplitter(chunk_size=2000, chunk_overlap=300)
+texts = text_splitter.split_documents(docs)
 
-    User question: {user_question}
-    """
+## Initialize embedding model
+embed_model = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
 
-    prompt = ChatPromptTemplate.from_template(template)
+try:
+    embeds = embed_model.embed_documents([doc.page_content for doc in texts])
+    print("Vectors done!!!")
+except Exception as e:
+    print(f"Error in embed process: {e}")
 
-    llm = ChatOpenAI()
+## Vector store
+vector_store = Chroma(embedding_function=embed_model, persist_directory="data")
 
-    chain = prompt | llm | StrOutputParser()
+vector_store.add_documents(documents=texts)
 
-    # return chain.invoke({
-    return chain.astream({
-        "chat_history": chat_history,
-        "user_question": query
-    })
+try:
+    test_query = "what is the name of student with id, S1004?"
+    results = vector_store.search(query=test_query, search_type='similarity')
+
+    unique_results = OrderedDict()
+    for doc in results:
+        if doc.page_content not in unique_results:
+            unique_results[doc.page_content] = doc
     
-## conversation
-for message in st.session_state.chat_history:
-    if isinstance(message, HumanMessage):
-        with st.chat_message("Human"):
-            st.markdown(message.content)
-    else:
-        with st.chat_message("AI"):
-            st.markdown(message.content)
-
-## user input
-user_query = st.chat_input("Your Query")
-if user_query is not None and user_query != "":
-    st.session_state.chat_history.append(HumanMessage(user_query))
-
-    with st.chat_message("Human"):
-        st.markdown(user_query)
-    
-    with st.chat_message("AI"):
-        ai_response = st.write_stream(get_response(user_query, st.session_state.chat_history))
-    
-    st.session_state.chat_history.append(AIMessage(ai_response))
+    final_results = list(unique_results.values())[:3]
+    print(f"Unique query results:\n{final_results}")
+except Exception as e:
+    print(f"Error during test query: {e}")
