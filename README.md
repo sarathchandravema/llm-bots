@@ -2,5 +2,13 @@
 LLM based bot for querying data in pdfs
 
 Steps Taken:
- * Added the UI set-up
- * Sending the query from user and getting a standard response from the system.
+ * Added the chat functionality.
+ * Added langchain streaming.
+
+Built it based on : https://youtu.be/zKGeRWjJlTU?si=4ZWdoz9t9FPYpC8n
+
+Modules used:
+ * langchain
+ * streamlit
+ * langchain-openai
+ * python-dotenv
