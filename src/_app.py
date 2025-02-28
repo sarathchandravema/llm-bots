@@ -1,12 +1,11 @@
-from dotenv import load_dotenv ## loads API keys
 from langchain_core.messages import HumanMessage, AIMessage ## schema for messages
 from langchain_core.prompts import ChatPromptTemplate ## Chat Prompt Template
-from langchain_openai import ChatOpenAI ## for chatting with OpenAI LLM
+# from langchain_openai import ChatOpenAI ## for chatting with OpenAI LLM
 from langchain_core.output_parsers.string import StrOutputParser
 
 import streamlit as st ## provides pre-built chatbot UI
 
-load_dotenv()
+# load_dotenv()
 
 if "chat_history" not in st.session_state:
     st.session_state.chat_history = []
